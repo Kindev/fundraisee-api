@@ -1,7 +1,7 @@
 # Fundraisee
 
-![Travis](https://img.shields.io/travis/Kindev/fundraisee-api/master.svg)
-[![Coverage Status](https://coveralls.io/repos/github/Kindev/fundraisee-api/badge.svg?branch=master)](https://coveralls.io/github/Kindev/fundraisee-api?branch=master)
+![Travis](https://travis-ci.com/Kindev/fundraisee-api.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Kindev/fundraisee-api/badge.svg)](https://coveralls.io/github/Kindev/fundraisee-api)
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
 
