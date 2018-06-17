@@ -24,9 +24,18 @@ Install all required dependencies
 pip install -r requirements.txt
 ```
 
-Create database and run the server, should be available on http://localhost:8000
+Create database, superuser and run the server, should be available on http://localhost:8000
 ```
 cd fundraisee
 python manage.py migrate
+python manage.py createsuperuser
 python manage.py runserver
 ```
+
+List of available API (browseable) at /api. Example: http://localhost:8000/api/user/register/
+* /user/ (GET)
+* /user/login/ (POST)
+* /user/register/ (POST)
+* /user/logout/ (POST)
+* /user/{username}/ (GET, PUT, DELETE)
+* /user/{username}/edit (POST)
