@@ -3,29 +3,28 @@ from rest_framework import generics, views
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
-    IsAdminUser,
-    IsAuthenticatedOrReadOnly,
 )
-from .permissions import IsOwnerOrAdminOrReadOnly
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-
-User = get_user_model()
-
+from .permissions import IsOwnerOrAdminOrReadOnly
 from .serializers import (
     UserCreateSerializer,
     UserLoginSerializer,
     UserTokenSerializer,
     UserDetailSerializer,
     UserListSerializer,
-    UserUpdateSerializer
+    UserUpdateSerializer,
 )
+
+User = get_user_model()
+
 
 class UserCreateAPIView(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
     queryset = User.objects.all()
     permission_classes = [AllowAny]
+
 
 class UserDetailAPIView(generics.RetrieveDestroyAPIView):
     queryset = User.objects.all()
@@ -33,16 +32,19 @@ class UserDetailAPIView(generics.RetrieveDestroyAPIView):
     lookup_field = 'username'
     permission_classes = [IsOwnerOrAdminOrReadOnly]
 
+
 class UserUpdateAPIView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
     lookup_field = 'username'
     permission_classes = [IsOwnerOrAdminOrReadOnly]
 
+
 class UserListAPIView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserListSerializer
     permission_classes = [IsAuthenticated]
+
 
 class UserLoginAPIView(views.APIView):
     permission_classes = [AllowAny]
@@ -61,6 +63,7 @@ class UserLoginAPIView(views.APIView):
             }, status=HTTP_200_OK)
 
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
 
 class UserLogoutAPIView(views.APIView):
     permission_classes = [IsAuthenticated]

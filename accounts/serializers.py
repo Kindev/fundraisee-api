@@ -5,6 +5,7 @@ from rest_framework.compat import authenticate
 from rest_framework.validators import UniqueValidator
 from accounts.models import UserProfile
 
+
 class UserDetailSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(source='profile.avatar')
     class Meta:
@@ -18,8 +19,10 @@ class UserDetailSerializer(serializers.ModelSerializer):
         ]
         lookup_field = 'username'
 
+
 class UserListSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(source='profile.avatar')
+
     class Meta:
         model = User
         fields = [
@@ -29,6 +32,7 @@ class UserListSerializer(serializers.ModelSerializer):
             'is_staff',
             'date_joined'
         ]
+
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(source='profile.avatar', allow_blank=True)
@@ -111,6 +115,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class UserCreateSerializer(serializers.ModelSerializer):
     username = serializers.SlugField(
         min_length=4,
@@ -173,6 +178,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         profile.save()
         return user
 
+
 class UserTokenSerializer(serializers.Serializer):
     username = serializers.CharField(label=_("Username"))
     password = serializers.CharField(
@@ -202,6 +208,7 @@ class UserTokenSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
+
 class UserLoginSerializer(serializers.ModelSerializer):
     username = serializers.SlugField(
         max_length=32,
@@ -212,6 +219,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     )
     token = serializers.CharField(allow_blank=True, read_only=True)
     name = serializers.CharField(source='profile.name', read_only=True)
+
     class Meta:
         model = User
         fields = [
@@ -220,4 +228,4 @@ class UserLoginSerializer(serializers.ModelSerializer):
             'password',
             'token',
         ]
-        extra_kwargs = {"password": {"write_only": True} }
+        extra_kwargs = {"password": {"write_only": True}}
