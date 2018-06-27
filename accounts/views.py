@@ -46,7 +46,7 @@ class UserListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class UserLoginAPIView(views.APIView):
+class UserLoginAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserLoginSerializer
 

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # third party packages
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
     'corsheaders',
 
      # fundraisee own django apps
@@ -56,6 +57,20 @@ REST_FRAMEWORK = {
    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
    ),
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+    'LOGIN_URL': '/login',
+    'LOGOUT_URL': '/logout',
+    'JSON_EDITOR': True,
+    'SHOW_REQUEST_HEADERS': True
 }
 
 MIDDLEWARE = [
