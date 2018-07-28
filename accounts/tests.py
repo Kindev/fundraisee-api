@@ -1,14 +1,18 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
+from django.apps import apps
 from django.urls import reverse
 from django.contrib.auth.models import User
 from accounts.managers import account_manager
+from accounts.apps import AccountsConfig
 
 
 class AccountsTestCase(APITestCase):
     def setUp(self):
         # We want to go ahead and originally create a user.
         self.test_user = account_manager.create_user('test', 'test@endilie.com', 'anythingcanlah')
+
+        self.test_user_2 = account_manager.create_user('anotheruser', 'test@another.com', 'lolololol')
 
         # URL for creating an account.
         self.create_url = reverse('user-register')
@@ -21,6 +25,11 @@ class AccountsTestCase(APITestCase):
 
         # URL for updating account
         self.update_url = reverse('user-update', kwargs={'username':'test'})
+
+    def test_create_super_user(self):
+        prev_cnt = User.objects.count()
+        User.objects.create_superuser('superuser', 'superuser@super.com', 'awkwakkwa')
+        self.assertEqual(User.objects.count(), prev_cnt + 1)
 
     def test_create_user(self):
         data = {
@@ -43,9 +52,10 @@ class AccountsTestCase(APITestCase):
             'password': 'foobar'
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['username']), 1)
 
     def test_create_user_with_no_username(self):
@@ -55,9 +65,10 @@ class AccountsTestCase(APITestCase):
             'password': 'foobarbaz'
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['username']), 1)
 
     def test_create_user_with_preexisting_username(self):
@@ -67,9 +78,10 @@ class AccountsTestCase(APITestCase):
             'password': 'testuser'
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['username']), 1)
 
     def test_create_user_with_no_password(self):
@@ -79,9 +91,10 @@ class AccountsTestCase(APITestCase):
             'password': ''
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['password']), 1)
 
     def test_create_user_with_preexisting_email(self):
@@ -91,9 +104,10 @@ class AccountsTestCase(APITestCase):
             'password': 'testuser'
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['email']), 1)
 
     def test_create_user_with_invalid_email(self):
@@ -103,9 +117,10 @@ class AccountsTestCase(APITestCase):
             'passsword': 'foobarbaz'
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['email']), 1)
 
     def test_create_user_with_no_email(self):
@@ -115,9 +130,10 @@ class AccountsTestCase(APITestCase):
                 'password': 'foobarbaz'
         }
 
+        prev_cnt = User.objects.count()
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), prev_cnt)
         self.assertEqual(len(response.data['email']), 1)
 
     def test_login_user(self):
@@ -161,3 +177,30 @@ class AccountsTestCase(APITestCase):
 
         self.test_user.refresh_from_db()
         self.assertTrue(self.test_user.check_password('testtest'))
+
+    def test_update_different_user(self):
+        data = {
+            'username': 'test',
+            'email': 'test@endilie.com',
+            'current_password': 'anythingcanlah',
+            'new_password': 'testtest',
+            'avatar': '',
+        }
+        self.client.force_login(user=self.test_user_2)
+        response = self.client.put(self.update_url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_without_login(self):
+        data = {
+            'username': 'test',
+            'email': 'test@endilie.com',
+            'current_password': 'anythingcanlah',
+            'new_password': 'testtest',
+            'avatar': '',
+        }
+        response = self.client.put(self.update_url, data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_apps(self):
+        self.assertEqual(AccountsConfig.name, 'accounts')
+        self.assertEqual(apps.get_app_config('accounts').name, 'accounts')

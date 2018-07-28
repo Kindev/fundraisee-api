@@ -15,10 +15,6 @@ class UserProfile(models.Model):
     # additional fields we want to store for user.
     avatar = models.URLField(default='', blank=True)
 
-    def __str__(self):
-        return self.user.username
-
-
 # automatically create a token for each new user
 @receiver(post_save, sender=User)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
